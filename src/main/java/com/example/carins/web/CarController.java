@@ -7,16 +7,23 @@ import com.example.carins.web.dto.CarDto;
 import com.example.carins.web.dto.ClaimDto;
 import com.example.carins.web.dto.ClaimResponseDto;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class CarController {
+
+    static final LocalDate MIN_DATE = LocalDate.of(1990,1,1);
+    static final LocalDate MAX_DATE = LocalDate.of(2025,12,12);
 
     private final CarService service;
 
@@ -32,7 +39,17 @@ public class CarController {
     @GetMapping("/cars/{carId}/insurance-valid")
     public ResponseEntity<?> isInsuranceValid(@PathVariable Long carId, @RequestParam String date) {
         // TODO: validate date format and handle errors consistently
-        LocalDate d = LocalDate.parse(date);
+        LocalDate d;
+        try{
+            d = LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (DateTimeParseException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Invalid date format. Expected ISO YYYY-MM-DD");
+        }
+        if(d.isBefore(MIN_DATE) || d.isAfter(MAX_DATE)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Date " + d + " is out of supported range " + MIN_DATE + " to " + MAX_DATE);
+        }
         boolean valid = service.isInsuranceValid(carId, d);
         return ResponseEntity.ok(new InsuranceValidityResponse(carId, d.toString(), valid));
     }
