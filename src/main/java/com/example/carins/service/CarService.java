@@ -2,6 +2,7 @@ package com.example.carins.service;
 
 import com.example.carins.model.Car;
 import com.example.carins.model.InsuranceClaim;
+import com.example.carins.model.InsurancePolicy;
 import com.example.carins.repo.CarRepository;
 import com.example.carins.repo.InsuranceClaimRepository;
 import com.example.carins.repo.InsurancePolicyRepository;
@@ -53,5 +54,9 @@ public class CarService {
 
     public List<InsuranceClaim> listInsuranceClaim(Long carId) {
         return claimRepository.findByCar_IdOrderByClaimDateAsc(carId); //find claims by car id
+    }
+
+    public List<InsurancePolicy> getExpiredPolicies() {
+        return policyRepository.findByEndDate(LocalDate.now().minusDays(1)); //current date - one day
     }
 }

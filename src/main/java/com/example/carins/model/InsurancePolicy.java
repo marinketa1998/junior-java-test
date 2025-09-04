@@ -1,6 +1,9 @@
 package com.example.carins.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 @Entity
@@ -14,7 +17,9 @@ public class InsurancePolicy {
 
     private String provider;
     private LocalDate startDate;
-    private LocalDate endDate; // nullable == open-ended
+    @Column(nullable = false)  //marks column as not null, database level
+    @NotNull //runtime validation, before persistance
+    private LocalDate endDate;
 
     public InsurancePolicy() {}
     public InsurancePolicy(Car car, String provider, LocalDate startDate, LocalDate endDate) {
