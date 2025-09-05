@@ -59,4 +59,12 @@ public class CarService {
     public List<InsurancePolicy> getExpiredPolicies() {
         return policyRepository.findByEndDate(LocalDate.now().minusDays(1)); //current date - one day
     }
+
+    public List<InsurancePolicy> getAllInsurancePolicies() {
+        return policyRepository.findAll();
+    }
+
+    public InsurancePolicy addInsurancePolicy(InsurancePolicy insurancePolicy) {
+        return policyRepository.save(insurancePolicy);
+    }
 }

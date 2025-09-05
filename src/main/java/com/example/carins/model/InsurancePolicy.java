@@ -9,7 +9,15 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "insurancepolicy")
 public class InsurancePolicy {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY,s)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "policy_seq")
+    @SequenceGenerator(
+            name = "policy_seq",
+            sequenceName = "policy_seq",   // must exist in DB or be created by Hibernate
+            initialValue = 10,           // first value Hibernate will ask for
+            allocationSize = 50            // performance; keep in sync with DB INCREMENT BY
+    )
     private Long id;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -18,8 +26,8 @@ public class InsurancePolicy {
     private String provider;
     private LocalDate startDate;
     @Column(nullable = false)  //marks column as not null, database level
-    @NotNull //runtime validation, before persistance
     private LocalDate endDate;
+
 
     public InsurancePolicy() {}
     public InsurancePolicy(Car car, String provider, LocalDate startDate, LocalDate endDate) {
